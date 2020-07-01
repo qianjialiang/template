@@ -1,6 +1,13 @@
 import request from '@/utils/request'
 import requestBlob from '@/utils/requestBlob'
 
+export function fCeShi() {
+  return request({
+    url: '/api/v1/customers/1271380907378479104/enable?enable=false',
+    method: 'post'
+  })
+}
+
 export function fGetCodeImage(code) {
   return requestBlob({
     url: '/account/manage/getCodeImage.json',

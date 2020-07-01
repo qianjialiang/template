@@ -1,6 +1,6 @@
 import defaultSettings from '@/settings'
 
-const title = defaultSettings.title || '秀 ++'
+const title = defaultSettings.title || '小猪快跑'
 
 export default function getPageTitle(pageTitle) {
   if (pageTitle) {

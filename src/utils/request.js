@@ -1,12 +1,12 @@
 import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
-// import { getToken } from '@/utils/auth'
+import { fGetUrl } from '@/utils'
 import qs from 'qs'
 
 // create an axios instance
 const service = axios.create({
-  // baseURL: url, // url = base url + request url
+  baseURL: fGetUrl(), // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
   timeout: 50000 // request timeout
 })
@@ -33,7 +33,6 @@ service.interceptors.request.use(
           }
         }
       }
-      // config.headers['X-Token'] = getToken()
     }
     if (method === 'get') {
       config.params = {

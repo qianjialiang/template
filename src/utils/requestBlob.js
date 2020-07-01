@@ -2,10 +2,11 @@ import axios from 'axios'
 import { Message } from 'element-ui'
 import store from '@/store'
 import qs from 'qs'
+import { fGetUrl } from '@/utils'
 
 // create an axios instance
 const service = axios.create({
-  // baseURL: url, // url = base url + request url
+  baseURL: fGetUrl(), // url = base url + request url
   timeout: 50000, // request timeout
   responseType: 'blob'
 })

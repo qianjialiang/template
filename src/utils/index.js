@@ -3,6 +3,18 @@
  */
 
 /**
+ * @returns {string}
+ */
+export function fGetUrl() {
+  const url = 'http://47.114.91.171:8080'
+  // let url = 'http://47.114.91.171:8080'
+  // if (location && location.hostname !== 'localhost') {
+  //   url = 'http://' + location.hostname + ':' + (location.port || 9000) + '/showServer'
+  // }
+  return url
+}
+
+/**
  * Parse the time to string
  * @param {(Object|string|number)} time
  * @param {string} cFormat

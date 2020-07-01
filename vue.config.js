@@ -6,7 +6,7 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const name = defaultSettings.title || '秀 ++' // page title
+const name = defaultSettings.title || '小猪快跑' // page title
 
 // If your port is set to 80,
 // use administrator privileges to execute the command line.
@@ -36,6 +36,16 @@ module.exports = {
       warnings: false,
       errors: true
     }
+    // proxy: {
+    //   // '^/*': 'http://47.114.91.171:8080'
+    //   '*': {
+    //     target: 'http://47.114.91.171:8080',
+    //     changeOrign: true,
+    //     pathRewrite: {
+    //       '^/*': '/'
+    //     }
+    //   }
+    // }
     // before: require('./mock/mock-server.js')
   },
   configureWebpack: {

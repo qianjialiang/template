@@ -1,5 +1,5 @@
 module.exports = {
-  title: '秀 ++',
+  title: '小猪快跑',
 
   /**
    * @type {boolean} true | false
