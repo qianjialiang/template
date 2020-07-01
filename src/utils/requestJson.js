@@ -5,13 +5,8 @@ import store from '@/store'
 // import qs from 'qs'
 
 // create an axios instance
-let url = 'http://47.98.49.65:9000/showServer'
-if (location && location.hostname !== 'localhost') {
-  url = 'http://' + location.hostname + ':' + (location.port || 9000) + '/showServer'
-}
 const service = axios.create({
-  // baseURL: 'http://47.98.49.65:9000/showServer', // url = base url + request url
-  baseURL: url, // url = base url + request url
+  // baseURL: url, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
   timeout: 50000 // request timeout
 })

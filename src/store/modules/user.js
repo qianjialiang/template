@@ -1,5 +1,5 @@
 // import { login, logout } from '@/api/user'
-import { login } from '@/api/user'
+// import { login } from '@/api/user'
 import { getToken, setToken, removeToken, getUserData, setUserData, removeUserData } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
 
@@ -23,46 +23,38 @@ const mutations = {
 
 const actions = {
   // user login
-  login({ commit, dispatch }, userInfo) {
-    const { username, password } = userInfo
+  login({ commit }, userInfo) {
+    // const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      // const data = {
-      //   account: {
-      //     url: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
-      //     name: 'Super Admin',
-      //     token: '123456'
-      //   },
-      //   roles: ['admin']
-      // }
-      // setUserData(data)
-      // commit('SET_TOKEN', data.account.token)
-      // setToken(data.account.token)
-      // resolve()
-      login({ username: username.trim(), password: password }).then(response => {
-        const { account, authCode } = response
-        let roles = []
-        if (authCode === 'all') {
-          roles = ['auth', 'model', 'log', 'emp', 'money', 'server', 'price', 'business']
-        } else if (authCode) {
-          roles = authCode.split(',')
-        } else {
-          roles.push('onlyReadMoney')
-        }
-        response.roles = roles
-        setUserData(response)
-
-        // videoPort 端口
-        commit('SET_TOKEN', account.token)
-        setToken(account.token)
-        resolve()
-      }).catch(error => {
-        reject(error)
-      })
+      const data = {
+        account: {
+          url: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
+          name: 'Super Admin',
+          token: '123456'
+        },
+        roles: ['admin']
+      }
+      setUserData(data)
+      commit('SET_TOKEN', data.account.token)
+      setToken(data.account.token)
+      resolve()
+      // login({ username: username.trim(), password: password }).then(response => {
+      //   const { account } = response
+      //   response.roles = ['admin']
+      //   setUserData(response)
+      //
+      //   // videoPort 端口
+      //   commit('SET_TOKEN', account.token)
+      //   setToken(account.token)
+      //   resolve()
+      // }).catch(error => {
+      //   reject(error)
+      // })
     })
   },
 
   // get user info
-  getInfo({ commit, dispatch }) {
+  getInfo({ commit }) {
     return new Promise((resolve, reject) => {
       const oUserData = getUserData()
       const { roles, account } = oUserData
