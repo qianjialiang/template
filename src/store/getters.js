@@ -1,9 +1,7 @@
-let url = 'http://47.98.49.65:9000/showServer'
-if (location && location.hostname !== 'localhost') {
-  url = 'http://' + location.hostname + ':' + (location.port || 9000) + '/showServer'
-}
+import { fGetUrl } from '@/utils'
+
 const getters = {
-  url: () => url,
+  url: () => fGetUrl(),
   sidebar: state => state.app.sidebar,
   size: state => state.app.size,
   device: state => state.app.device,

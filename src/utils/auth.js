@@ -1,34 +1,27 @@
-import Cookies from 'js-cookie'
-
 const TokenKey = 'Admin-Token'
 const UserData = 'User-Data'
 
 export function getToken() {
-  return Cookies.get(TokenKey)
+  return localStorage.getItem(TokenKey)
 }
 
 export function setToken(token) {
-  return Cookies.set(TokenKey, token)
+  return localStorage.setItem(TokenKey, token)
 }
 
 export function removeToken() {
-  return Cookies.remove(TokenKey)
+  return localStorage.removeItem(TokenKey)
 }
 
 export function getUserData() {
-  const oUserData = Cookies.get(UserData)
-  if (oUserData) {
-    return JSON.parse(oUserData)
-  } else {
-    return {}
-  }
+  return localStorage.getItem(UserData)
 }
 
 export function setUserData(token) {
-  return Cookies.set(UserData, JSON.stringify(token))
+  return localStorage.setItem(UserData, JSON.stringify(token))
 }
 
 export function removeUserData() {
-  return Cookies.remove(UserData)
+  return localStorage.removeItem(UserData)
 }
 
