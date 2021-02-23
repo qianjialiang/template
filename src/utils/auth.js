@@ -14,11 +14,15 @@ export function removeToken() {
 }
 
 export function getUserData() {
-  return localStorage.getItem(UserData)
+  const data = localStorage.getItem(UserData)
+  if (data) {
+    return JSON.parse(data)
+  }
+  return {}
 }
 
-export function setUserData(token) {
-  return localStorage.setItem(UserData, JSON.stringify(token))
+export function setUserData(data) {
+  return localStorage.setItem(UserData, JSON.stringify(data))
 }
 
 export function removeUserData() {

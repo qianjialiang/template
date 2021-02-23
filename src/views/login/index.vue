@@ -45,7 +45,7 @@
         </el-form-item>
       </el-tooltip>
 
-      <el-form-item prop="authCode">
+      <!--<el-form-item prop="authCode">
         <span class="svg-container">
           <svg-icon icon-class="qrcode" />
         </span>
@@ -61,7 +61,7 @@
         <span class="show-pwd" @click="imgSrc">
           <img :src="bImgSrc">
         </span>
-      </el-form-item>
+      </el-form-item>-->
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
 
@@ -150,7 +150,7 @@ export default {
   },
   mounted() {
     this.fFocus()
-    this.imgSrc()
+    // this.imgSrc()
   },
   destroyed() {
     // window.removeEventListener('storage', this.afterQRScan)
@@ -200,7 +200,7 @@ export default {
               this.loading = false
             })
             .catch(() => {
-              this.imgSrc()
+              // this.imgSrc()
               this.loading = false
             })
         } else {
