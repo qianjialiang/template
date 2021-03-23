@@ -1,11 +1,10 @@
 <template>
   <div>
-    <el-button @click="fCeShi">ceshi</el-button>
+    123
   </div>
 </template>
 
 <script>
-import { fCeShi } from '@/api/user'
 
 export default {
   name: 'DashboardIndex',
@@ -14,9 +13,6 @@ export default {
     }
   },
   methods: {
-    fCeShi() {
-      fCeShi()
-    }
   }
 }
 </script>

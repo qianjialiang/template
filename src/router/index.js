@@ -102,7 +102,7 @@ export const asyncRoutes = [
   /** when your routing map is too long, you can split it into small modules **/
 
   // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  { path: '*', redirect: '/redirect/', hidden: true }
 ]
 
 const createRouter = () => new Router({

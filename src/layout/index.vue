@@ -1,5 +1,8 @@
 <template>
   <div :class="classObj" class="app-wrapper">
+    <div class="home-header">
+      桐乡市应急管理局安全生产风险防控数字化平台
+    </div>
     <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside" />
     <sidebar class="sidebar-container" />
     <div :class="{hasTagsView:needTagsView}" class="main-container">
@@ -66,6 +69,7 @@ export default {
     position: relative;
     height: 100%;
     width: 100%;
+    padding-top: 50px;
 
     &.mobile.openSidebar {
       position: fixed;

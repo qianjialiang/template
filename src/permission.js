@@ -10,6 +10,8 @@ NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
 const whiteList = ['/login'] // no redirect whitelist
 
+let oMain = ''
+
 router.beforeEach(async(to, from, next) => {
   // start progress bar
   NProgress.start()
@@ -29,6 +31,12 @@ router.beforeEach(async(to, from, next) => {
       // determine whether the user has obtained his permission roles through getInfo
       const hasRoles = store.getters.roles && store.getters.roles.length > 0
       if (hasRoles) {
+        if (!oMain) {
+          oMain = document.getElementById('app-main')
+        }
+        if (oMain) {
+          oMain.scrollTop = 0
+        }
         next()
       } else {
         try {

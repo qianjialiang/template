@@ -6,7 +6,7 @@
  * @returns {string}
  */
 export function fGetUrl() {
-  const url = 'http://47.114.91.171:8080'
+  const url = 'http://116.62.137.136:9510'
   // let url = 'http://47.114.91.171:8080'
   // if (location && location.hostname !== 'localhost') {
   //   url = 'http://' + location.hostname + ':' + (location.port || 9000) + '/showServer'

@@ -17,25 +17,23 @@ service.interceptors.request.use(
     config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
 
     const { method } = config
-    if (store.getters.token) {
-      if (method === 'get') {
-        config.params.token = store.getters.token
-      } else {
-        if (config.data) {
-          config.data.token = store.getters.token
-        } else {
-          config.data = {
-            token: store.getters.token
-          }
-        }
+    let data = {
+      ...config.data
+    }
+    if (method === 'get') {
+      data = {
+        ...config.params
       }
+    }
+    if (store.getters.token) {
+      data.token = store.getters.token
     }
     if (method === 'get') {
       config.params = {
-        ...config.params
+        ...data
       }
     } else {
-      config.data = qs.stringify(config.data)
+      config.data = qs.stringify(data)
     }
     return config
   },
@@ -53,7 +51,7 @@ service.interceptors.response.use(
   error => {
     console.log('err' + error) // for debug
     Message({
-      message: error.error,
+      message: error.msg,
       type: 'error',
       duration: 5 * 1000
     })

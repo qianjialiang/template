@@ -66,16 +66,19 @@ h2,
 h3,
 h4,
 h5,
-h6,
-p{
+h6{
   padding: 0;
   margin: 0;
 }
-
+p{
+  margin-top: 0;
+}
 .fr {
   float: right;
 }
-
+ul{
+  list-style: none;
+}
 .fl {
   float: left;
 }
@@ -229,15 +232,30 @@ aside {
 
 .filter-container {
   padding-bottom: 10px;
+  overflow: hidden;
 
   .filter-item {
     display: inline-block;
     vertical-align: middle;
     margin-bottom: 10px;
+    >span{
+      padding-left: 8px;
+    }
+    >.el-input{
+      width: 260px;
+    }
   }
   .filter-item+.filter-item{
     margin-left: 12px;
   }
+  .fr{
+    margin-right: 12px;
+  }
+}
+
+.el-pagination{
+  text-align: center;
+  margin-top: 10px;
 }
 
 //refine vue-multiselect plugin
@@ -247,6 +265,13 @@ aside {
 
 .multiselect--active {
   z-index: 1000 !important;
+}
+
+.block-div-tabs{
+  margin-bottom: -1px;
+  .el-tabs__header{
+    margin-bottom: 0;
+  }
 }
 
 // qian css
