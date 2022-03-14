@@ -18,7 +18,6 @@
   </div>
 </template>
 <script>
-import { fGetUrl } from '@/utils'
 export default {
   props: {
     accept: {
@@ -29,7 +28,7 @@ export default {
   },
   data() {
     return {
-      action: fGetUrl() + '/common/file/upload',
+      action: process.env.VUE_APP_BASE_API + '/common/file/upload',
       fileList: []
     }
   },

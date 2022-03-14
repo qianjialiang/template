@@ -10,25 +10,28 @@
       </div>
     </div>
 
-    <el-table
-      :data="oData.list"
-      border
-      style="width: 100%"
-    >
-      <el-table-column
-        type="index"
-        label="序号"
-        :index="indexMethod"
-        width="80"
-        align="center"
-      />
-      <slot name="main" />
-    </el-table>
+    <slot name="table" :list="oData.list" :indexMethod="indexMethod">
+      <el-table
+        :data="oData.list"
+        border
+        size="mini"
+        style="width: 100%"
+      >
+        <el-table-column
+          type="index"
+          label="序号"
+          :index="indexMethod"
+          width="60"
+          align="center"
+        />
+        <slot name="main" />
+      </el-table>
+    </slot>
 
     <el-pagination
-      :current-page.sync="oPageData.page"
+      :current-page.sync="oPageData.pageIndex"
       :page-sizes="[10, 20, 30, 50]"
-      :page-size.sync="oPageData.limit"
+      :page-size.sync="oPageData.pageSize"
       layout="total, sizes, prev, pager, next, jumper"
       :total="oData.count"
       background
@@ -42,11 +45,23 @@
 
 export default {
   props: {
+    constData: {
+      type: Object,
+      default: null
+    },
     queryData: {
       type: Object,
       default: null
     },
     getFunction: {
+      type: Function,
+      default: null
+    },
+    autoGet: {
+      type: Boolean,
+      default: true
+    },
+    loopData: {
       type: Function,
       default: null
     }
@@ -58,8 +73,8 @@ export default {
         count: 0
       },
       oPageData: {
-        page: 1,
-        limit: 10
+        pageIndex: 1,
+        pageSize: 10
       },
       oQueryData: null
     }
@@ -71,37 +86,60 @@ export default {
   },
   created() {
     this.oQueryData = this.queryData
-    this.fGetDataList()
+    if (this.autoGet === true) {
+      this.fGetDataList()
+    }
   },
   methods: {
     indexMethod(index) {
-      return (this.oPageData.page - 1) * this.oPageData.limit + index + 1
+      return (this.oPageData.pageIndex - 1) * this.oPageData.pageSize + index + 1
     },
     fGetDataList() {
       const obj = {
-        ...this.oPageData,
-        ...this.oQueryData
+        ...this.constData
+      }
+      obj.pageSize = this.oPageData.pageSize
+      obj.pageIndex = (this.oPageData.pageIndex - 1)
+      for (const key in this.oQueryData) {
+        const data = this.oQueryData[key]
+        if (data || data === 0) {
+          obj[key] = data
+        }
       }
       if (!this.getFunction) {
         return
       }
       console.log(obj)
       this.getFunction(obj).then(res => {
-        this.oData.list = res.data
-        this.oData.count = parseInt(res.count)
+        if (this.loopData) {
+          this.oData.list = res.data.map(row => {
+            return this.loopData(row)
+          })
+        } else {
+          this.oData.list = res.data
+        }
+        this.oData.count = parseInt(res.totalSize)
+      }).catch(() => {
+        this.oData.list = []
+        this.oData.count = 0
       })
     },
     fSearchDataList() {
-      this.oPageData.page = 1
+      this.oPageData.pageIndex = 1
       this.fGetDataList()
     },
     fClearDataList() {
       this.oPageData = {
-        page: 1,
-        limit: 10
+        pageIndex: 1,
+        pageSize: 10
       }
-      this.oQueryData = {}
-      this.$emit('update:queryData', {})
+      const obj = {}
+      for (const key in this.oQueryData) {
+        obj[key] = ''
+      }
+      this.oQueryData = obj
+      this.$emit('update:queryData', obj)
+      this.$emit('fClearData')
 
       this.fGetDataList(true)
     }

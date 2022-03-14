@@ -13,8 +13,6 @@
 
 <script>
 
-import { fGetUrl } from '@/utils'
-
 export default {
   props: {
     image: {
@@ -37,7 +35,7 @@ export default {
   data() {
     return {
       imageUrl: this.image,
-      url: fGetUrl() + '/common/file/upload'
+      url: process.env.VUE_APP_BASE_API + '/common/file/upload'
     }
   },
   watch: {
