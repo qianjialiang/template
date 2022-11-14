@@ -14,9 +14,9 @@ export function isExternal(path) {
  * @param {string} str
  * @returns {Boolean}
  */
-export function validPhone(str) {
-  const reg = /^1[3456789]\d{9}$/
-  return reg.test(str)
+export function validUsername(str) {
+  const valid_map = ['admin', 'editor']
+  return valid_map.indexOf(str.trim()) >= 0
 }
 
 /**
@@ -84,4 +84,13 @@ export function isArray(arg) {
     return Object.prototype.toString.call(arg) === '[object Array]'
   }
   return Array.isArray(arg)
+}
+
+/**
+ * @param {string} password
+ * @returns {Boolean}
+ */
+export function validPassword(password) {
+  const reg = /(?!^[0-9]+$)(?!^[a-z]+$)(?!^[A-Z]+$)(?!^[^A-z0-9]+$)^[^\s\u4e00-\u9fa5]{8,}/
+  return reg.test(password)
 }

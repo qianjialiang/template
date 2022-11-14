@@ -1,18 +1,26 @@
 /**
  * Created by PanJiaChen on 16/11/18.
  */
+import { $Type } from '@/settings'
 
 /**
  * @returns {string}
  */
-export function fGetUrl() {
-  const url = 'http://116.62.137.136:9510'
-  // let url = 'http://47.114.91.171:8080'
-  // if (location && location.hostname !== 'localhost') {
-  //   url = 'http://' + location.hostname + ':' + (location.port || 9000) + '/showServer'
-  // }
-  return url
-}
+export const sNowUrl = (() => {
+  if (process.env.NODE_ENV === 'production') {
+    return `http://${location.hostname}:8082`
+    // return `http://${location.hostname}:8080`
+    // return `http://192.168.10.93:8080`
+  }
+  if ($Type === 3) {
+    return 'http://192.168.10.88:8082'
+    // return 'http://192.168.10.69:8082'
+  }
+  // return 'http://121.40.60.197:8082'
+  return 'http://192.168.10.88:8082'
+  // return 'http://223.4.77.125:8082'
+  // return process.env.VUE_APP_BASE_API
+})()
 
 /**
  * Parse the time to string
@@ -21,7 +29,7 @@ export function fGetUrl() {
  * @returns {string | null}
  */
 export function parseTime(time, cFormat) {
-  if (arguments.length === 0) {
+  if (arguments.length === 0 || !time) {
     return null
   }
   const format = cFormat || '{y}-{m}-{d} {h}:{i}:{s}'
@@ -29,9 +37,17 @@ export function parseTime(time, cFormat) {
   if (typeof time === 'object') {
     date = time
   } else {
-    if ((typeof time === 'string') && (/^[0-9]+$/.test(time))) {
-      time = parseInt(time)
+    if ((typeof time === 'string')) {
+      if ((/^[0-9]+$/.test(time))) {
+        // support "1548221490638"
+        time = parseInt(time)
+      } else {
+        // support safari
+        // https://stackoverflow.com/questions/4310953/invalid-date-in-safari
+        time = time.replace(new RegExp(/-/gm), '/')
+      }
     }
+
     if ((typeof time === 'number') && (time.toString().length === 10)) {
       time = time * 1000
     }
@@ -96,36 +112,6 @@ export function formatTime(time, option) {
       '分'
     )
   }
-}
-
-/**
- * @param {number} time
- * @returns {string}
- */
-export function startTime(time) {
-  let oDate = new Date()
-  if (time) {
-    oDate = time
-  }
-  oDate.setHours(0)
-  oDate.setMinutes(0)
-  oDate.setSeconds(0)
-  return oDate
-}
-
-/**
- * @param {number} time
- * @returns {string}
- */
-export function lastTime(time) {
-  let oDate = new Date()
-  if (time) {
-    oDate = time
-  }
-  oDate.setHours(23)
-  oDate.setMinutes(59)
-  oDate.setSeconds(59)
-  return oDate
 }
 
 /**
@@ -196,19 +182,21 @@ export function param(json) {
  * @returns {Object}
  */
 export function param2Obj(url) {
-  const search = url.split('?')[1]
+  const search = decodeURIComponent(url.split('?')[1]).replace(/\+/g, ' ')
   if (!search) {
     return {}
   }
-  return JSON.parse(
-    '{"' +
-      decodeURIComponent(search)
-        .replace(/"/g, '\\"')
-        .replace(/&/g, '","')
-        .replace(/=/g, '":"')
-        .replace(/\+/g, ' ') +
-      '"}'
-  )
+  const obj = {}
+  const searchArr = search.split('&')
+  searchArr.forEach(v => {
+    const index = v.indexOf('=')
+    if (index !== -1) {
+      const name = v.substring(0, index)
+      const val = v.substring(index + 1, v.length)
+      obj[name] = val
+    }
+  })
+  return obj
 }
 
 /**
@@ -358,20 +346,6 @@ export function createUniqueString() {
 }
 
 /**
- * @returns {string}
- */
-export function createAuthCode() {
-  const code = []
-  const codeLength = 4 // 验证码的长度
-  // 所有候选组成验证码的字符，可以用中文
-  const selectChar = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-  for (var i = 0; i < codeLength; i++) {
-    code.push(selectChar[Math.floor(Math.random() * 10)])
-  }
-  return code.join('')
-}
-
-/**
  * Check if an element has a class
  * @param {HTMLElement} elm
  * @param {string} cls
@@ -400,13 +374,4 @@ export function removeClass(ele, cls) {
     const reg = new RegExp('(\\s|^)' + cls + '(\\s|$)')
     ele.className = ele.className.replace(reg, ' ')
   }
-}
-
-/**
- * Is an empty object
- * @param {obj} obj
- * @returns {boolean}
- */
-export function isEmptyObject(obj) {
-  return Object.keys(obj).length === 0
 }

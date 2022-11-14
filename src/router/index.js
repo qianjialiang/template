@@ -21,6 +21,7 @@ import Layout from '@/layout'
     roles: ['admin','editor']    control the page roles (you can set multiple roles)
     title: 'title'               the name show in sidebar and breadcrumb (recommend set)
     icon: 'svg-name'             the icon show in the sidebar
+    iframe: true                 if set true, the page will append to body(default is false)
     noCache: true                if set true, the page will no be cached(default is false)
     affix: true                  if set true, the tag will affix in the tags-view
     breadcrumb: false            if set false, the item will hidden in breadcrumb(default is true)
@@ -81,7 +82,26 @@ export const asyncRoutes = [
         path: 'dashboard',
         component: () => import('@/views/dashboard/index'),
         name: 'DashboardIndex',
-        meta: { title: '概览', affix: true, noCache: true }
+        meta: { title: '概览', affix: true, iframe: true, noCache: true }
+      }
+    ]
+  },
+
+  {
+    path: '/system',
+    component: Layout,
+    redirect: '/system/account',
+    name: 'System',
+    meta: {
+      title: '配置中心',
+      icon: 'system'
+    },
+    children: [
+      {
+        path: 'account',
+        component: () => import('@/views/system/account'),
+        name: 'SystemAccount',
+        meta: { title: '组织架构', noCache: true }
       }
     ]
   },
@@ -94,7 +114,7 @@ export const asyncRoutes = [
         path: 'index',
         component: () => import('@/views/icons/index'),
         name: 'Icons',
-        meta: { title: 'Icons', icon: 'icon', noCache: true }
+        meta: { title: 'Icons', icon: 'icon', noCache: true, typeFilter: ($Type) => { return $Type === 1 } }
       }
     ]
   },

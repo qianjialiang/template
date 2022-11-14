@@ -1,4 +1,43 @@
 import store from '@/store'
+import { asyncRoutes } from '@/router'
+
+const fFormatRoute = (arr) => {
+  return arr.map(item => {
+    if (item.name) {
+      const obj = {
+        id: item.name,
+        path: item.path.replace('/', ''),
+        label: item.meta.title
+      }
+      if (item.children && item.children.length > 0) {
+        obj.children = fFormatRoute(item.children)
+      }
+      return obj
+    }
+  })
+}
+
+const permissionData = fFormatRoute(asyncRoutes.filter(item => {
+  return item.name
+}))
+
+const permissionList = []
+
+function fGetPermission(arr) {
+  arr.forEach(row => {
+    permissionList.push(row.id)
+    if (row.children) {
+      fGetPermission(row.children)
+    }
+  })
+}
+
+fGetPermission(permissionData)
+
+export {
+  permissionData,
+  permissionList
+}
 
 /**
  * @param {Array} value
@@ -13,11 +52,7 @@ export default function checkPermission(value) {
     const hasPermission = roles.some(role => {
       return permissionRoles.includes(role)
     })
-
-    if (!hasPermission) {
-      return false
-    }
-    return true
+    return hasPermission
   } else {
     console.error(`need roles! Like v-permission="['admin','editor']"`)
     return false

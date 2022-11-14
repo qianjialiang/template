@@ -1,10 +1,20 @@
 <template>
-  <section id="app-main" class="app-main">
-    <transition name="fade-transform" mode="out-in">
-      <keep-alive :include="cachedViews">
-        <router-view :key="key" />
-      </keep-alive>
-    </transition>
+  <section class="app-main">
+    <div class="app-main-div" :class="{'app-main-iframe': route.meta.iframe}">
+      <transition-group name="fade-transform" mode="out-in">
+        <component
+          :is="item.name"
+          v-for="item in iframeViews"
+          v-show="route.path === item.path"
+          :key="item.name"
+        />
+      </transition-group>
+      <transition name="fade-transform" mode="out-in">
+        <keep-alive v-if="!route.meta.iframe" :include="cachedViews">
+          <router-view :key="route.path" />
+        </keep-alive>
+      </transition>
+    </div>
   </section>
 </template>
 
@@ -15,8 +25,11 @@ export default {
     cachedViews() {
       return this.$store.state.tagsView.cachedViews
     },
-    key() {
-      return this.$route.path
+    iframeViews() {
+      return this.$store.state.tagsView.iframeViews
+    },
+    route() {
+      return this.$route
     }
   }
 }
@@ -25,28 +38,22 @@ export default {
 <style lang="scss" scoped>
 .app-main {
   /* 50= navbar  50  */
-  height: calc(100vh - 100px);
-  padding: 10px 20px;
+  height: calc(100vh - 50px);
   width: 100%;
+  padding: 10px;
   position: relative;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
 
-  &::-webkit-scrollbar {/*滚动条整体样式*/
-    width: 6px;     /*高宽分别对应横竖滚动条的尺寸*/
-    height: 6px;
-    scrollbar-arrow-color:red;
-  }
-  &::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
-    border-radius: 5px;
-    -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
-    background: rgba(0,0,0,0.2);
-    scrollbar-arrow-color:red;
-  }
-  &::-webkit-scrollbar-track {/*滚动条里面轨道*/
-    -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
-    border-radius: 0;
-    background: rgba(0,0,0,0.1);
+  >.app-main-div{
+    height: 100%;
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+    //background-color: #fff;
+
+    &.app-main-iframe{
+      overflow: hidden;
+    }
   }
 }
 

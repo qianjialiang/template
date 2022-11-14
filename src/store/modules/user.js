@@ -1,19 +1,40 @@
-// import { login, getInfo } from '@/api/user'
-import { getToken, setToken, removeToken } from '@/utils/auth'
-import router, { resetRouter } from '@/router'
+import { fLogin, fLogout, fGetAccountInfo } from '@/api/user'
+import { getToken, setToken, removeToken, getPhone, setPhone, removePhone } from '@/utils/auth'
+import { permissionData, permissionList } from '@/utils/permission'
+// import { sNowUrl } from '@/utils'
 
 const state = {
   token: getToken(),
+  phone: getPhone(),
   name: '',
+  avatar: '',
+  permissionData,
+  permissionList,
   roles: []
 }
 
 const mutations = {
   SET_TOKEN: (state, token) => {
+    if (token) {
+      setToken(token)
+    } else {
+      removeToken()
+    }
     state.token = token
+  },
+  SET_PHONE: (state, phone) => {
+    if (phone) {
+      setPhone(phone)
+    } else {
+      removePhone()
+    }
+    state.phone = phone
   },
   SET_NAME: (state, name) => {
     state.name = name
+  },
+  SET_AVATAR: (state, avatar) => {
+    state.avatar = avatar
   },
   SET_ROLES: (state, roles) => {
     state.roles = roles
@@ -23,74 +44,61 @@ const mutations = {
 const actions = {
   // user login
   login({ commit }, userInfo) {
-    // const { username, password } = userInfo
-    // return new Promise((resolve, reject) => {
-    //   login({ username: username.trim(), password: password }).then(response => {
-    //     const { data } = response
-    //
-    //     // videoPort 端口
-    //     commit('SET_TOKEN', data.token)
-    //     setToken(data.token)
-    //     resolve()
-    //   }).catch(error => {
-    //     reject(error)
-    //   })
-    // })
-
     return new Promise((resolve, reject) => {
-      commit('SET_TOKEN', '123456')
-      setToken('123456')
-      resolve()
+      fLogin(userInfo).then(response => {
+        const { data } = response
+        commit('SET_TOKEN', data.token)
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
     })
   },
 
   // get user info
-  getInfo({ commit }) {
-    // return new Promise((resolve, reject) => {
-    //   getInfo().then(response => {
-    //     const { data } = response
-    //     if (!data) {
-    //       reject('Verification failed, please Login again.')
-    //     }
-    //     data.roles = ['admin']
-    //     const { roles, realname } = data
-    //     commit('SET_ROLES', roles)
-    //     commit('SET_NAME', realname)
-    //     resolve(data)
-    //   }).catch(error => {
-    //     reject(error)
-    //   })
-    // })
-
+  getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      const oUserData = {
-        account: {
-          url: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
-          name: 'Super Admin',
-          token: '123456'
-        },
-        roles: ['admin']
-      }
-      const { roles, account } = oUserData
+      fGetAccountInfo().then(response => {
+        // eslint-disable-next-line no-undef
+        // showVideo.setVideoOption({
+        //   type: 2,
+        //   url: sNowUrl,
+        //   token: state.token,
+        //   src: ''
+        // })
 
-      commit('SET_ROLES', roles)
-      commit('SET_NAME', account.name)
-      resolve(oUserData)
+        const { data } = response
+        if (data.auth === 'all') {
+          data.roles = permissionList
+        } else if (data.auth) {
+          data.roles = data.auth.split(',')
+        } else {
+          data.roles = ['admin']
+        }
+        const { roles, realname, username } = data
+        commit('SET_ROLES', roles)
+        commit('SET_NAME', realname)
+        commit('SET_PHONE', username)
+        resolve(data)
+      }).catch(error => {
+        reject(error)
+      })
     })
   },
 
   // user logout
   logout({ commit, state, dispatch }) {
     return new Promise((resolve, reject) => {
-      commit('SET_TOKEN', '')
-      commit('SET_ROLES', [])
-      removeToken()
-      resetRouter()
+      fLogout().then(() => {
+        dispatch('resetToken')
 
-      // reset visited views and cached views
-      dispatch('tagsView/delAllViews', null, { root: true })
+        // reset visited views and cached views
+        dispatch('tagsView/delAllViews', null, { root: true })
 
-      resolve()
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
     })
   },
 
@@ -99,33 +107,9 @@ const actions = {
     return new Promise(resolve => {
       commit('SET_TOKEN', '')
       commit('SET_ROLES', [])
-      removeToken()
-      resolve()
-    })
-  },
+      // commit('SET_PHONE', '')
 
-  // dynamically modify permissions
-  changeRoles({ commit, dispatch }, role) {
-    return new Promise(async resolve => {
-      const token = role + '-token'
-
-      commit('SET_TOKEN', token)
-      setToken(token)
-
-      const { roles } = await dispatch('getInfo')
-
-      resetRouter()
-
-      // generate accessible routes map based on roles
-      const accessRoutes = await dispatch('permission/generateRoutes', roles, { root: true })
-
-      // dynamically add accessible routes
-      router.addRoutes(accessRoutes)
-
-      // reset visited views and cached views
-      dispatch('tagsView/delAllViews', null, { root: true })
-
-      resolve()
+      location.reload()
     })
   }
 }

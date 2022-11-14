@@ -84,9 +84,8 @@
 </template>
 
 <script>
-import md5 from 'md5'
-import { createAuthCode } from '@/utils'
-import { fGetCodeImage } from '@/api/user'
+// import md5 from 'md5'
+// import axios from 'axios'
 
 export default {
   name: 'Login',
@@ -128,32 +127,19 @@ export default {
       loading: false,
       showDialog: false,
       sAuthCode: '',
-      bImgSrc: ''
-      // redirect: undefined,
-      // otherQuery: {}
+      bImgSrc: '',
+      redirect: undefined,
+      otherQuery: {}
     }
   },
   watch: {
-    // $route: {
-    //   handler: function(route) {
-    //     const query = route.query
-    //     if (query) {
-    //       this.redirect = query.redirect
-    //       this.otherQuery = this.getOtherQuery(query)
-    //     }
-    //   },
-    //   immediate: true
-    // }
   },
   created() {
-    // window.addEventListener('storage', this.afterQRScan)
   },
   mounted() {
     this.fFocus()
-    // this.imgSrc()
   },
   destroyed() {
-    // window.removeEventListener('storage', this.afterQRScan)
   },
   methods: {
     fFocus() {
@@ -162,14 +148,8 @@ export default {
       } else if (this.loginForm.password === '') {
         this.$refs.password.focus()
       } else {
-        this.$refs.authCode.focus()
+        // this.$refs.authCode.focus()
       }
-    },
-    imgSrc() {
-      this.sAuthCode = createAuthCode()
-      fGetCodeImage(this.sAuthCode).then(response => {
-        this.bImgSrc = URL.createObjectURL(response)
-      })
     },
     checkCapslock(e) {
       const { key } = e
@@ -191,7 +171,7 @@ export default {
           this.loading = true
           const obj = {
             username: this.loginForm.username,
-            password: md5(this.loginForm.password)
+            password: this.$Base64.encode(this.loginForm.password)
           }
           this.$store.dispatch('user/login', obj)
             .then(() => {
@@ -200,7 +180,6 @@ export default {
               this.loading = false
             })
             .catch(() => {
-              // this.imgSrc()
               this.loading = false
             })
         } else {
@@ -209,36 +188,7 @@ export default {
           return false
         }
       })
-    },
-    createAuthCode() {
-      this.sAuthCode = createAuthCode()
     }
-    // getOtherQuery(query) {
-    //   return Object.keys(query).reduce((acc, cur) => {
-    //     if (cur !== 'redirect') {
-    //       acc[cur] = query[cur]
-    //     }
-    //     return acc
-    //   }, {})
-    // }
-    // afterQRScan() {
-    //   if (e.key === 'x-admin-oauth-code') {
-    //     const code = getQueryObject(e.newValue)
-    //     const codeMap = {
-    //       wechat: 'code',
-    //       tencent: 'code'
-    //     }
-    //     const type = codeMap[this.auth_type]
-    //     const codeName = code[type]
-    //     if (codeName) {
-    //       this.$store.dispatch('LoginByThirdparty', codeName).then(() => {
-    //         this.$router.push({ path: this.redirect || '/' })
-    //       })
-    //     } else {
-    //       alert('第三方登录失败')
-    //     }
-    //   }
-    // }
   }
 }
 </script>
@@ -298,7 +248,7 @@ $light_gray:#666;
   min-height: 100%;
   width: 100%;
   /*background-color: $bg;*/
-  background: url('../../assets/login/login_bg.jpg') no-repeat;
+  // background: url('../../assets/login/login_bg.png') no-repeat;
   /*background-position: 50%;*/
   overflow: hidden;
 
@@ -309,7 +259,7 @@ $light_gray:#666;
     padding: 100px 35px;
     top: 0;
     bottom: 0;
-    left: 50%;
+    left: 0;
     right: 0;
     height: 540px;
     margin: auto;
@@ -318,11 +268,11 @@ $light_gray:#666;
     background-color: #eee;
     transition: all 0.3s;
 
-    &:hover{
-      width: 380px;
-      height: 570px;
-      padding: 115px 45px;
-    }
+    //&:hover{
+    //  width: 380px;
+    //  height: 570px;
+    //  padding: 115px 45px;
+    //}
   }
 
   .tips {

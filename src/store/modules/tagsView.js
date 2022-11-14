@@ -1,6 +1,7 @@
 const state = {
   visitedViews: [],
-  cachedViews: []
+  cachedViews: [],
+  iframeViews: []
 }
 
 const mutations = {
@@ -11,6 +12,13 @@ const mutations = {
         title: view.meta.title || 'no-name'
       })
     )
+    if (view.meta.iframe) {
+      state.iframeViews.push(
+        Object.assign({}, view, {
+          title: (view.query && view.query.title) || view.meta.title || 'no-name'
+        })
+      )
+    }
   },
   ADD_CACHED_VIEW: (state, view) => {
     if (state.cachedViews.includes(view.name)) return

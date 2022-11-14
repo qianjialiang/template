@@ -1,5 +1,6 @@
 // import parseTime, formatTime and set to filter
 export { parseTime, formatTime } from '@/utils'
+import * as selectItem from '@/utils/selectItem'
 
 /**
  * Show plural label if time is plural number
@@ -66,3 +67,20 @@ export function toThousandFilter(num) {
 export function uppercaseFirst(string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
 }
+
+/**
+ * value to name
+ * @param {String} key
+ * @param {String} value
+ * @param {String} type
+ */
+export function fValueToName(key = 'onlineStatus', value, type = 'name') {
+  const arr = selectItem[key]
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i].value === value) {
+      return arr[i][type]
+    }
+  }
+  return ''
+}
+

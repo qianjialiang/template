@@ -1,11 +1,11 @@
 import axios from 'axios'
-import { MessageBox, Message } from 'element-ui'
+import { Message } from 'element-ui'
 import store from '@/store'
-// import qs from 'qs'
+import { sNowUrl } from '@/utils'
 
 // create an axios instance
 const service = axios.create({
-  baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
+  baseURL: sNowUrl, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
   timeout: 50000 // request timeout
 })
@@ -16,11 +16,31 @@ service.interceptors.request.use(
     // do something before request is sent
     config.headers['Content-Type'] = 'application/json'
 
-    const { url } = config
-    if (store.getters.token && url.indexOf('.do') >= 0) {
-      config.url = url + '?token=' + store.getters.token.replace(/\+/g, encodeURIComponent('+'))
+    const { path, url } = config
+    const sToken = store.getters.token || ''
+    const arr = []
+    if (path) {
+      arr.push('path=' + path)
     }
-    config.data = JSON.stringify(config.data)
+    if (sToken) {
+      arr.push('token=' + sToken)
+    }
+
+    const obj = {}
+    if (config.data) {
+      Object.keys(config.data).forEach(key => {
+        const data = config.data[key]
+        if (typeof data === 'string') {
+          obj[key] = data.trim()
+        } else {
+          obj[key] = data
+        }
+      })
+    }
+    if (arr.length > 0) {
+      config.url = url + '?' + arr.join('&')
+    }
+    config.data = JSON.stringify(obj)
 
     return config
   },
@@ -36,7 +56,7 @@ service.interceptors.response.use(
   /**
    * If you want to get http information such as headers or status
    * Please return  response => response
-  */
+   */
 
   /**
    * Determine the request status by custom code
@@ -46,30 +66,39 @@ service.interceptors.response.use(
   response => {
     const res = response.data
 
-    // if the custom code is not 20000, it is judged as an error.
     if (res.code !== 0) {
-      Message({
-        message: res.msg || 'Error',
-        type: 'error',
-        duration: 5 * 1000
-      })
-
-      // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      if (res.code === 401 || res.code === 50012 || res.code === 50014) {
-        // to re-login
-        MessageBox.confirm('你的账号已经在其他地方登录，请重新登录', '退出登录', {
-          confirmButtonText: '重新登录',
-          cancelButtonText: '无视',
-          type: 'warning'
-        }).then(() => {
-          store.dispatch('user/resetToken').then(() => {
-            location.reload()
-          })
+      if (!(res.code === -1 && res.msg === '未查询到信息')) {
+        Message({
+          message: res.msg || 'Error',
+          type: 'error',
+          duration: 5 * 1000
         })
+      }
+
+      if (res.code === 1001) {
+        // to re-login
+        // MessageBox.confirm('你的账号已经在其他地方登录，请重新登录', '退出登录', {
+        //   confirmButtonText: '重新登录',
+        //   cancelButtonText: '无视',
+        //   type: 'warning'
+        // }).then(() => {
+        //   store.dispatch('user/resetToken')
+        // })
+        store.dispatch('user/resetToken')
       }
       return Promise.reject(new Error(res.msg || 'Error'))
     } else {
-      return res
+      const vGateRes = res.data
+      if (vGateRes.code !== 1) {
+        Message({
+          message: vGateRes.msg || 'Error',
+          type: 'error',
+          duration: 5 * 1000
+        })
+        return Promise.reject(vGateRes)
+      } else {
+        return vGateRes
+      }
     }
   },
   error => {

@@ -12,6 +12,9 @@ export default {
     return {
     }
   },
+  activated() {
+    console.log(1)
+  },
   methods: {
   }
 }

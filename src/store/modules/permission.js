@@ -1,4 +1,7 @@
+import Vue from 'vue'
 import { asyncRoutes, constantRoutes } from '@/router'
+import { $Type } from '@/settings'
+import { getToken } from '@/utils/auth'
 
 /**
  * Use meta.role to determine if the current user has permission
@@ -6,8 +9,13 @@ import { asyncRoutes, constantRoutes } from '@/router'
  * @param route
  */
 function hasPermission(roles, route) {
-  if (route.meta && route.meta.roles) {
-    return roles.some(role => route.meta.roles.includes(role))
+  // if (route.meta && route.meta.roles) {
+  //   return roles.some(role => route.meta.roles.includes(role))
+  // } else {
+  //   return true
+  // }
+  if (route.meta) {
+    return (!route.meta.roles || roles.some(role => route.meta.roles.includes(role))) && (!route.meta.typeFilter || route.meta.typeFilter($Type))
   } else {
     return true
   }
@@ -23,11 +31,19 @@ export function filterAsyncRoutes(routes, roles) {
 
   routes.forEach(route => {
     const tmp = { ...route }
+    if (tmp.meta && tmp.meta.iframe) {
+      Vue.component(tmp.name, tmp.component)
+    }
+    if (tmp.hasToken) {
+      tmp.path = tmp.path + (tmp.path.indexOf('?') === -1 ? '?' : '&') + 'token=' + getToken()
+    }
     if (hasPermission(roles, tmp)) {
       if (tmp.children) {
         tmp.children = filterAsyncRoutes(tmp.children, roles)
       }
-      res.push(tmp)
+      if (!tmp.children || tmp.children.length > 0) {
+        res.push(tmp)
+      }
     }
   })
 
