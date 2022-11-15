@@ -48,15 +48,25 @@ module.exports = {
     // }
     // before: require('./mock/mock-server.js')
   },
-  configureWebpack: {
+  configureWebpack: config => {
     // provide the app's title in webpack's name field, so that
     // it can be accessed in index.html to inject the correct title.
-    name: name,
-    resolve: {
+    config.module.rules.filter(rule => {
+      return rule.test.toString().indexOf('scss') !== -1
+    }).forEach(rule => {
+      rule.oneOf.forEach(oneOfRule => {
+        oneOfRule.use.splice(oneOfRule.use.indexOf(require.resolve('sass-loader')), 0,
+          { loader: require.resolve('css-unicode-loader') })
+      })
+    })
+    // 开发生产共同配置别名
+    config.name = name
+    Object.assign(config.resolve, {
       alias: {
         '@': resolve('src')
+        // '@': path.resolve(__dirname, './src')
       }
-    }
+    })
   },
   chainWebpack(config) {
     config.plugins.delete('preload') // TODO: need test
