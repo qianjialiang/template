@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="height: 100%">
     <div ref="TablePageBtn" class="table-page-btn">
       <div class="filter-container">
         <slot :search="fSearchDataList" :clear="fClearDataList" />
@@ -17,6 +17,7 @@
         ref="elTable"
         :data="filterData"
         :height="nowHeight"
+        :header-cell-style="{background:'#f6f7fb'}"
         :max-height="maxHeight"
         style="width: 100%"
         :row-key="rowKey"
@@ -37,6 +38,7 @@
     </slot>
 
     <el-pagination
+      v-if="!noPage"
       :current-page.sync="oPageData.page"
       :page-sizes="[10, 20, 30, 50]"
       :page-size.sync="oPageData.limit"
@@ -75,6 +77,10 @@ export default {
       default: null
     },
     falsePage: {
+      type: Boolean,
+      default: false
+    },
+    noPage: {
       type: Boolean,
       default: false
     },
@@ -139,13 +145,41 @@ export default {
   },
   mounted() {
     if (!this.maxHeight) {
-      const height = this.$el.clientHeight - 42 - Math.ceil(this.$refs.TablePageBtn.clientHeight)
+      const height = this.$el.clientHeight - Math.ceil(this.$refs.TablePageBtn.clientHeight) - (this.noPage ? 0 : 42)
       this.nowHeight = this.height || height || null
     }
   },
   methods: {
     indexMethod(index) {
       return (this.oPageData.page - 1) * this.oPageData.limit + index + 1
+    },
+    fDataList(res) {
+      const arr = res.data || []
+      if (this.loopData) {
+        this.oData.list = this.loopData(arr)
+      } else {
+        this.oData.list = arr
+      }
+
+      if (this.rowKey && this.selection && this.aChangeIndex.length > 0) {
+        this.$nextTick(() => {
+          this.oData.list.forEach(item => {
+            const id = item[this.rowKey]
+            if (id) {
+              const index = this.aChangeIndex.indexOf(id)
+              if (index !== -1) {
+                this.$refs.elTable.toggleRowSelection(item, true)
+              }
+            }
+          })
+        })
+      }
+
+      let count = parseInt(res.count || res.totalSize)
+      if (this.falsePage) {
+        count = this.oData.list.length
+      }
+      this.oData.count = count
     },
     fGetDataList() {
       const obj = {
@@ -167,31 +201,7 @@ export default {
 
       this.$emit('fGetData')
       this.getFunction(obj).then(res => {
-        if (this.loopData) {
-          this.oData.list = this.loopData(res.data)
-        } else {
-          this.oData.list = res.data
-        }
-
-        if (this.rowKey && this.selection && this.aChangeIndex.length > 0) {
-          this.$nextTick(() => {
-            this.oData.list.forEach(item => {
-              const id = item[this.rowKey]
-              if (id) {
-                const index = this.aChangeIndex.indexOf(id)
-                if (index !== -1) {
-                  this.$refs.elTable.toggleRowSelection(item, true)
-                }
-              }
-            })
-          })
-        }
-
-        let count = parseInt(res.count || res.totalSize)
-        if (this.falsePage) {
-          count = this.oData.list.length
-        }
-        this.oData.count = count
+        this.fDataList(res)
       }).catch(() => {
         this.oData.list = []
         this.oData.count = 0
