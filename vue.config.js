@@ -35,17 +35,32 @@ module.exports = {
     overlay: {
       warnings: false,
       errors: true
+    },
+    proxy: {
+      // '/auth': 'https://tpass.sichuan.chinatax.gov.cn:8443/sys-api/v1.0/auth'
+      // '/*': {
+      //   target: 'https://tpass.sichuan.chinatax.gov.cn:8443/sys-api/v1.0',
+      //   changeOrign: true,
+      //   pathRewrite: {
+      //     '^/auth': '/auth'
+      //   }
+      // },
+      '/test': {
+        target: 'http://124.221.187.204:8991',
+        changeOrign: true,
+        pathRewrite: {
+          '^/test': '/test'
+        }
+      },
+      '/*': {
+        target: 'https://tpass.zhejiang.chinatax.gov.cn:8443/sys-api/v1.0',
+        changeOrign: true,
+        pathRewrite: {
+          '^/auth': '/auth',
+          '^/acl': '/acl'
+        }
+      }
     }
-    // proxy: {
-    //   // '^/*': 'http://47.114.91.171:8080'
-    //   '*': {
-    //     target: 'http://47.114.91.171:8080',
-    //     changeOrign: true,
-    //     pathRewrite: {
-    //       '^/*': '/'
-    //     }
-    //   }
-    // }
     // before: require('./mock/mock-server.js')
   },
   configureWebpack: config => {

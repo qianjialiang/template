@@ -6,17 +6,32 @@
         <h3 class="title">登录</h3>
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="creditCode">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
-          ref="username"
-          v-model="loginForm.username"
-          placeholder="账号"
-          name="username"
+          ref="creditCode"
+          v-model="loginForm.creditCode"
+          placeholder="税号"
+          name="creditCode"
           type="text"
           tabindex="1"
+          autocomplete="on"
+        />
+      </el-form-item>
+
+      <el-form-item prop="account">
+        <span class="svg-container">
+          <svg-icon icon-class="user" />
+        </span>
+        <el-input
+          ref="account"
+          v-model="loginForm.account"
+          placeholder="账号"
+          name="account"
+          type="text"
+          tabindex="2"
           autocomplete="on"
         />
       </el-form-item>
@@ -33,7 +48,7 @@
             :type="passwordType"
             placeholder="密码"
             name="password"
-            tabindex="2"
+            tabindex="3"
             autocomplete="on"
             @keyup.native="checkCapslock"
             @blur="capsTooltip = false"
@@ -86,6 +101,8 @@
 <script>
 // import md5 from 'md5'
 // import axios from 'axios'
+// import hmacSHA256 from 'crypto-js/hmac-sha256'
+// import Base64 from 'crypto-js/enc-base64'
 
 export default {
   name: 'Login',
@@ -113,12 +130,14 @@ export default {
     }
     return {
       loginForm: {
-        authCode: '',
-        username: '',
-        password: ''
+        // authCode: '',
+        account: '13568985364',
+        creditCode: '91510108MA61RFD77H',
+        password: 'zy230609'
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', message: '请输入账号名称' }],
+        account: [{ required: true, trigger: 'blur', message: '请输入账号名称' }],
+        creditCode: [{ required: true, trigger: 'blur', message: '请输入税号' }],
         authCode: [{ required: true, trigger: 'blur', validator: validateAuthCode }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
@@ -135,16 +154,29 @@ export default {
   watch: {
   },
   created() {
+    // eslint-disable-next-line no-undef
+    if (oKey.type === 2) {
+      this.loginForm = {
+        account: '18057179365',
+        creditCode: '913301026680332757',
+        password: 'Asd333275@'
+      }
+    }
+    this.$store.dispatch('key/getPublicKey').then(res => {
+      console.log(1)
+      this.handleLogin()
+    })
   },
   mounted() {
     this.fFocus()
+    // this.handleLogin()
   },
   destroyed() {
   },
   methods: {
     fFocus() {
-      if (this.loginForm.username === '') {
-        this.$refs.username.focus()
+      if (this.loginForm.account === '') {
+        this.$refs.account.focus()
       } else if (this.loginForm.password === '') {
         this.$refs.password.focus()
       } else {
@@ -169,19 +201,13 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          const obj = {
-            username: this.loginForm.username,
-            password: this.$Base64.encode(this.loginForm.password)
-          }
-          this.$store.dispatch('user/login', obj)
-            .then(() => {
-              // this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
-              this.$router.push('/')
-              this.loading = false
-            })
-            .catch(() => {
-              this.loading = false
-            })
+          this.$store.dispatch('key/login', this.loginForm).then(() => {
+            // this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
+            this.$router.push('/')
+            this.loading = false
+          }).catch(() => {
+            this.loading = false
+          })
         } else {
           console.log('error submit!!')
           this.fFocus()

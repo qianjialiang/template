@@ -1,4 +1,4 @@
-import { fLogin, fLogout, fGetAccountInfo } from '@/api/user'
+import { fLogin } from '@/api/user'
 import { getToken, setToken, removeToken, getPhone, setPhone, removePhone } from '@/utils/auth'
 import { permissionData, permissionList } from '@/utils/permission'
 // import { sNowUrl } from '@/utils'
@@ -42,6 +42,13 @@ const mutations = {
 }
 
 const actions = {
+  setToken({ commit }, token) {
+    return new Promise(resolve => {
+      console.log(token)
+      commit('SET_TOKEN', token)
+      resolve()
+    })
+  },
   // user login
   login({ commit }, userInfo) {
     return new Promise((resolve, reject) => {
@@ -58,47 +65,55 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      fGetAccountInfo().then(response => {
-        // eslint-disable-next-line no-undef
-        // showVideo.setVideoOption({
-        //   type: 2,
-        //   url: sNowUrl,
-        //   token: state.token,
-        //   src: ''
-        // })
-
-        const { data } = response
-        if (data.auth === 'all') {
-          data.roles = permissionList
-        } else if (data.auth) {
-          data.roles = data.auth.split(',')
-        } else {
-          data.roles = ['admin']
-        }
-        const { roles, realname, username } = data
-        commit('SET_ROLES', roles)
-        commit('SET_NAME', realname)
-        commit('SET_PHONE', username)
-        resolve(data)
-      }).catch(error => {
-        reject(error)
+      const roles = ['admin']
+      commit('SET_ROLES', roles)
+      commit('SET_NAME', '123')
+      commit('SET_PHONE', '123')
+      resolve({
+        roles
       })
+      // fGetAccountInfo().then(response => {
+      //   // eslint-disable-next-line no-undef
+      //   // showVideo.setVideoOption({
+      //   //   type: 2,
+      //   //   url: sNowUrl,
+      //   //   token: state.token,
+      //   //   src: ''
+      //   // })
+
+      //   const { data } = response
+      //   if (data.auth === 'all') {
+      //     data.roles = permissionList
+      //   } else if (data.auth) {
+      //     data.roles = data.auth.split(',')
+      //   } else {
+      //     data.roles = ['admin']
+      //   }
+      //   const { roles, realname, username } = data
+      //   commit('SET_ROLES', roles)
+      //   commit('SET_NAME', realname)
+      //   commit('SET_PHONE', username)
+      //   resolve(data)
+      // }).catch(error => {
+      //   reject(error)
+      // })
     })
   },
 
   // user logout
   logout({ commit, state, dispatch }) {
     return new Promise((resolve, reject) => {
-      fLogout().then(() => {
-        dispatch('resetToken')
+      dispatch('resetToken')
+      // fLogout().then(() => {
+      //   dispatch('resetToken')
 
-        // reset visited views and cached views
-        dispatch('tagsView/delAllViews', null, { root: true })
+      //   // reset visited views and cached views
+      //   dispatch('tagsView/delAllViews', null, { root: true })
 
-        resolve()
-      }).catch(error => {
-        reject(error)
-      })
+      //   resolve()
+      // }).catch(error => {
+      //   reject(error)
+      // })
     })
   },
 
