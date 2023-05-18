@@ -157,7 +157,7 @@ function fSm4() {
 
 var oKey = {
   // 1 四川 2 浙江
-  type: 2,
+  type: 1,
   newKey: () => {
     function r(e, t) {
       var n, a, i = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".split(""), r = [];

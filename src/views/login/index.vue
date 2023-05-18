@@ -60,23 +60,23 @@
         </el-form-item>
       </el-tooltip>
 
-      <!--<el-form-item prop="authCode">
+      <el-form-item prop="authCode">
         <span class="svg-container">
           <svg-icon icon-class="qrcode" />
         </span>
         <el-input
           ref="authCode"
-          v-model="loginForm.authCode"
+          v-model="oKeySms.smsCode"
           placeholder="验证码"
           name="authCode"
           type="text"
           tabindex="1"
           autocomplete="on"
         />
-        <span class="show-pwd" @click="imgSrc">
+        <!-- <span class="show-pwd" @click="imgSrc">
           <img :src="bImgSrc">
-        </span>
-      </el-form-item>-->
+        </span> -->
+      </el-form-item>
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
 
@@ -99,6 +99,8 @@
 </template>
 
 <script>
+/* eslint-disable no-undef */
+
 // import md5 from 'md5'
 // import axios from 'axios'
 // import hmacSHA256 from 'crypto-js/hmac-sha256'
@@ -118,19 +120,19 @@ export default {
         callback()
       }
     }
-    const validateAuthCode = (rule, value, callback) => {
-      if (!value) {
-        callback(new Error('请输入验证码'))
-      }
-      if (value !== this.sAuthCode) {
-        callback(new Error('验证码不正确'))
-      } else {
-        callback()
-      }
-    }
+    // const validateAuthCode = (rule, value, callback) => {
+    //   if (!value) {
+    //     callback(new Error('请输入验证码'))
+    //   }
+    //   if (value !== this.sAuthCode) {
+    //     callback(new Error('验证码不正确'))
+    //   } else {
+    //     callback()
+    //   }
+    // }
     return {
       loginForm: {
-        // authCode: '',
+        // smsCode: '',
         account: '13568985364',
         creditCode: '91510108MA61RFD77H',
         password: 'zy230609'
@@ -138,7 +140,7 @@ export default {
       loginRules: {
         account: [{ required: true, trigger: 'blur', message: '请输入账号名称' }],
         creditCode: [{ required: true, trigger: 'blur', message: '请输入税号' }],
-        authCode: [{ required: true, trigger: 'blur', validator: validateAuthCode }],
+        // authCode: [{ required: true, trigger: 'blur', validator: validateAuthCode }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       passwordType: 'password',
@@ -148,13 +150,16 @@ export default {
       sAuthCode: '',
       bImgSrc: '',
       redirect: undefined,
-      otherQuery: {}
+      otherQuery: {},
+
+      oKeySms: {
+        smsCode: ''
+      }
     }
   },
   watch: {
   },
   created() {
-    // eslint-disable-next-line no-undef
     if (oKey.type === 2) {
       this.loginForm = {
         account: '18057179365',
@@ -162,9 +167,17 @@ export default {
         password: 'Asd333275@'
       }
     }
-    this.$store.dispatch('key/getPublicKey').then(res => {
-      console.log(1)
-      this.handleLogin()
+    this.$store.dispatch('key/getPublicKey').then(() => {
+      if (oKey.type === 1) {
+        this.$store.dispatch('key/sendSmsCode', this.loginForm).then(res => {
+          console.log(res)
+          this.oKeySms = {
+            smscode_id: res.smscode_id,
+            uuid: res.uuid
+          }
+        })
+      }
+      // this.handleLogin()
     })
   },
   mounted() {
@@ -201,9 +214,9 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('key/login', this.loginForm).then(() => {
+          this.$store.dispatch('key/login', oKey.type === 1 ? this.oKeySms : this.loginForm).then(() => {
             // this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
-            this.$router.push('/')
+            // this.$router.push('/')
             this.loading = false
           }).catch(() => {
             this.loading = false

@@ -52,14 +52,22 @@ module.exports = {
           '^/test': '/test'
         }
       },
+      // https://tpass.sichuan.chinatax.gov.cn:8443/sys-api/v1.0/auth/oauth2/getPublicKey
       '/*': {
-        target: 'https://tpass.zhejiang.chinatax.gov.cn:8443/sys-api/v1.0',
+        target: 'https://tpass.sichuan.chinatax.gov.cn:8443/sys-api/v1.0',
         changeOrign: true,
         pathRewrite: {
-          '^/auth': '/auth',
-          '^/acl': '/acl'
+          '^/auth': '/auth'
         }
       }
+      // '/*': {
+      //   target: 'https://tpass.zhejiang.chinatax.gov.cn:8443/sys-api/v1.0',
+      //   changeOrign: true,
+      //   pathRewrite: {
+      //     '^/auth': '/auth',
+      //     '^/acl': '/acl'
+      //   }
+      // }
     }
     // before: require('./mock/mock-server.js')
   },

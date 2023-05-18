@@ -3,7 +3,7 @@
 
 // import { sNowUrl } from '@/utils'
 import { fOauth2GetPublicKey, fSm2PublicKey, fWhiteSendSm4 } from '@/api/key'
-import { fFactorAccountLogin, fSendSmsCodeByUuid } from '@/api/key'
+import { fFactorAccountLogin, fSendSmsCodeByUuid, fSmsMessageLogin } from '@/api/key'
 import { fAccountLogin, fQuickLogin } from '@/api/key'
 
 const state = {
@@ -55,6 +55,8 @@ const actions = {
             fWhiteSendSm4({
               uuid: oData.uuid,
               secret: res
+            }).then(() => {
+              resolve()
             })
           })
         }
@@ -62,6 +64,7 @@ const actions = {
     })
   },
   login({ dispatch }, data) {
+    console.log(data)
     const obj = {
       ...data,
       client_id: oKey.client_id,
@@ -114,28 +117,63 @@ const actions = {
           reject(error)
         })
       } else {
-        fFactorAccountLogin(obj).then(res => {
-          // const { data } = response
-          // commit('SET_TOKEN', data.token)
-          const datagram = res.datagram || ''
+        fSmsMessageLogin(obj).then(({ datagram }) => {
           if (datagram) {
             const data = oKey.sm4.decrypt(datagram, oKey.keyFilter(state.newKey))
             if (data) {
               try {
                 const oData = JSON.parse(data)
-                const uuid = oData && oData.uuid
-                fSendSmsCodeByUuid(uuid)
+                console.log(oData)
+                dispatch('user/setToken', oData.access_token, { root: true })
+                // fSendSmsCodeByUuid(uuid)
+                resolve()
               } catch (error) {
                 console.log(error)
               }
             }
-            // console.log(data)
           }
-          // resolve()
-        }).catch(error => {
-          reject(error)
         })
       }
+    })
+  },
+  sendSmsCode({ commit, state }, data) {
+    const obj = {
+      ...data,
+      client_id: oKey.client_id,
+      redirect_uri: oKey.redirect_uri
+    }
+    return new Promise((resolve, reject) => {
+      fFactorAccountLogin(obj).then(res => {
+        if (res.datagram) {
+          const data = oKey.sm4.decrypt(res.datagram, oKey.keyFilter(state.newKey))
+          if (data) {
+            try {
+              const oData = JSON.parse(data)
+              const uuid = oData && oData.uuid
+              fSendSmsCodeByUuid(uuid).then(({ datagram }) => {
+                if (datagram) {
+                  const data = oKey.sm4.decrypt(datagram, oKey.keyFilter(state.newKey))
+                  if (data) {
+                    try {
+                      const oData2 = JSON.parse(data)
+                      oData2.uuid = uuid
+                      resolve(oData2)
+                    } catch (error) {
+                      console.log(error)
+                    }
+                  }
+                }
+              })
+            } catch (error) {
+              console.log(error)
+            }
+          }
+          // console.log(data)
+        }
+        // resolve()
+      }).catch(error => {
+        reject(error)
+      })
     })
   }
 }

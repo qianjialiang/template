@@ -49,6 +49,13 @@ export function fSendSmsCodeByUuid(uuid) {
   })
 }
 
+export function fSmsMessageLogin(data) {
+  return requestJson({
+    url: '/auth/enterprise/quick/SmsMessageLogin',
+    method: 'post',
+    data
+  })
+}
 // 浙江登录
 export function fAccountLogin(data) {
   return requestJson({
