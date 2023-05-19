@@ -64,17 +64,16 @@ const actions = {
     })
   },
   login({ dispatch }, data) {
-    console.log(data)
     const obj = {
       ...data,
       client_id: oKey.client_id,
       redirect_uri: oKey.redirect_uri
     }
 
+    // console.log(JSON.stringify(obj))
     return new Promise((resolve, reject) => {
       if (oKey.type === 2) {
         fAccountLogin(obj).then(res => {
-          console.log(JSON.stringify(obj))
           // const { data } = response
           // commit('SET_TOKEN', data.token)
           const datagram = res.datagram || ''
@@ -142,6 +141,7 @@ const actions = {
       client_id: oKey.client_id,
       redirect_uri: oKey.redirect_uri
     }
+    // console.log(JSON.stringify(obj))
     return new Promise((resolve, reject) => {
       fFactorAccountLogin(obj).then(res => {
         if (res.datagram) {

@@ -78,7 +78,9 @@
         </span> -->
       </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
+      <el-button :loading="loading" type="primary" style="width:100%;" :disabled="!bDisabled" @click="sendSmsCode">发送验证码</el-button>
+      <span style="margin-bottom:10px;" />
+      <el-button :loading="loading" type="primary" style="width:100%;" :disabled="bDisabled" @click="handleLogin">登录</el-button>
 
       <!--<div style="position:relative">
         <div class="tips">
@@ -153,8 +155,14 @@ export default {
       otherQuery: {},
 
       oKeySms: {
-        smsCode: ''
+        smsCode: '',
+        smscode_id: ''
       }
+    }
+  },
+  computed: {
+    bDisabled() {
+      return oKey.type === 1 && !this.oKeySms.smscode_id
     }
   },
   watch: {
@@ -168,15 +176,6 @@ export default {
       }
     }
     this.$store.dispatch('key/getPublicKey').then(() => {
-      if (oKey.type === 1) {
-        this.$store.dispatch('key/sendSmsCode', this.loginForm).then(res => {
-          console.log(res)
-          this.oKeySms = {
-            smscode_id: res.smscode_id,
-            uuid: res.uuid
-          }
-        })
-      }
       // this.handleLogin()
     })
   },
@@ -210,13 +209,21 @@ export default {
         this.$refs.password.focus()
       })
     },
+    sendSmsCode() {
+      this.$store.dispatch('key/sendSmsCode', this.loginForm).then(res => {
+        this.oKeySms = {
+          smscode_id: res.smscode_id,
+          uuid: res.uuid
+        }
+      })
+    },
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
           this.$store.dispatch('key/login', oKey.type === 1 ? this.oKeySms : this.loginForm).then(() => {
             // this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
-            // this.$router.push('/')
+            this.$router.push('/')
             this.loading = false
           }).catch(() => {
             this.loading = false
